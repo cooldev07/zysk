@@ -38,7 +38,7 @@ const SearchComponent = () => {
       <Formik
         initialValues={{
           query: "",
-          filteredTodos: todos, // Set initial filteredTodos to the fetched todos
+          filteredTodos: todos,
           error: "",
           noResults: false,
         }}
@@ -57,7 +57,7 @@ const SearchComponent = () => {
             resetForm({
               values: {
                 query: "",
-                filteredTodos: todos, // Reset filteredTodos to the original todos
+                filteredTodos: todos,
                 error: "",
                 noResults: false,
               },
@@ -110,3 +110,4 @@ const SearchComponent = () => {
 };
 
 export default SearchComponent;
+

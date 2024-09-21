@@ -1,92 +1,78 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
-  }
-  
-  .search-container {
-    max-width: 600px;
+.search-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 20px;
+    max-width: 800px;
     margin: 20px auto;
     padding: 20px;
-    border: 2px solid #dc3545;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     background-color: #fff;
-    background-image: linear-gradient(to bottom right, #f8d7da, #fff);
   }
   
   .title {
     text-align: center;
-    color: #dc3545;
     font-size: 2rem;
-    margin-bottom: 20px;
+    color: #333;
   }
   
   .form {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px;
+  }
+  
+  .input-group {
     display: flex;
     flex-direction: column;
   }
   
-  .input-group {
-    margin-bottom: 10px;
-  }
-  
   .input {
-    width: 100%;
     padding: 10px;
-    border: 1px solid #dc3545;
-    border-radius: 4px;
-    font-size: 16px;
-    transition: border-color 0.3s;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
   }
   
   .input:focus {
-    border-color: #c82333;
+    border-color: #007bff;
     outline: none;
-  }
-  
-  .error {
-    color: red;
-    font-size: 12px;
   }
   
   .button-group {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 10px;
+    justify-content: center;
   }
   
   .button {
     padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    background-color: #dc3545;
+    background-color: #007bff;
     color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.3s;
-    font-size: 16px;
   }
   
   .button:hover {
-    background-color: #c82333;
-  }
-  
-  .reset-button {
-    background-color: #007bff;
-  }
-  
-  .reset-button:hover {
     background-color: #0056b3;
   }
   
-  .error-message {
-    color: red;
-    text-align: center;
+  .reset-button {
+    background-color: #f44336;
   }
   
-  .no-results {
-    text-align: center;
-    color: #555;
+  .reset-button:hover {
+    background-color: #d32f2f;
+  }
+  
+  .error {
+    color: red;
+    font-size: 0.9rem;
   }
   
   .todo-list {
@@ -96,15 +82,25 @@ body {
   
   .todo-item {
     padding: 10px;
-    border-bottom: 1px solid #ddd;
+    border: 1px solid #e0e0e0;
+    border-radius: 5px;
+    margin: 5px 0;
+    background-color: #f9f9f9;
     transition: background-color 0.3s;
   }
   
-  .todo-item:last-child {
-    border-bottom: none;
+  .todo-item:hover {
+    background-color: #e0f7fa;
   }
   
-  .todo-item:hover {
-    background-color: #f8d7da;
+  .no-results {
+    text-align: center;
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .error-message {
+    text-align: center;
+    color: red;
   }
   
