@@ -1,80 +1,107 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import "./SearchComponent.css"; // Import the CSS file
 
 const SearchComponent = () => {
-  const [todos, setTodos] = useState([]);
-  const [filteredTodos, setFilteredTodos] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [noResults, setNoResults] = useState(false);
-
-  // Fetch data from the API
   const fetchTodos = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await axios.get("https://jsonplaceholder.typicode.com/todos");
-      setTodos(response.data);
-      setFilteredTodos(response.data); // Set all data initially
-    } catch (error) {
-      setError("Failed to fetch data from API.");
-    } finally {
-      setLoading(false);
-    }
+    const response = await axios.get(
+      "https://jsonplaceholder.typicode.com/todos"
+    );
+    return response.data;
   };
 
-  // Fetch data on component mount
-  React.useEffect(() => {
-    fetchTodos();
-  }, []);
-
-  // Formik validation schema
   const validationSchema = Yup.object({
     query: Yup.string().required("Search query is required"),
   });
 
-  // Filter the data based on the search query
-  const handleSearch = (values) => {
-    const filtered = todos.filter((todo) =>
-      todo.title.toLowerCase().includes(values.query.toLowerCase())
-    );
-
-    setFilteredTodos(filtered);
-    setNoResults(filtered.length === 0);
-  };
-
   return (
-    <div>
-      <h1>Search Todos</h1>
+    <div className="search-container">
+      <h1 className="title">Search Todos</h1>
       <Formik
-        initialValues={{ query: "" }}
+        initialValues={{
+          query: "",
+          todos: [],
+          filteredTodos: [],
+          error: "",
+          noResults: false,
+        }}
         validationSchema={validationSchema}
-        onSubmit={handleSearch}
+        onSubmit={async (values, { setFieldValue }) => {
+          const todos = await fetchTodos();
+          setFieldValue("todos", todos);
+          const filtered = todos.filter((todo) =>
+            todo.title.toLowerCase().includes(values.query.toLowerCase())
+          );
+          setFieldValue("filteredTodos", filtered);
+          setFieldValue("noResults", filtered.length === 0);
+          setFieldValue("error", "");
+        }}
       >
-        <Form>
-          <div>
-            <Field name="query" type="text" placeholder="Search todos..." />
-            <ErrorMessage name="query" component="div" style={{ color: "red" }} />
-          </div>
-          <button type="submit">Search</button>
-        </Form>
-      </Formik>
+        {({ handleSubmit, resetForm, values }) => {
+          useEffect(() => {
+            const loadData = async () => {
+              const todos = await fetchTodos();
+              resetForm({
+                values: {
+                  query: "",
+                  todos,
+                  filteredTodos: todos,
+                  error: "",
+                  noResults: false,
+                },
+              });
+            };
+            loadData();
+          }, [resetForm]);
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : error ? (
-        <p>{error}</p>
-      ) : noResults ? (
-        <p>No results found</p>
-      ) : (
-        <ul>
-          {filteredTodos.map((todo) => (
-            <li key={todo.id}>{todo.title}</li>
-          ))}
-        </ul>
-      )}
+          return (
+            <Form onSubmit={handleSubmit} className="form">
+              <div className="input-group">
+                <Field
+                  name="query"
+                  type="text"
+                  placeholder="Search todos..."
+                  className="input"
+                />
+                <ErrorMessage name="query" component="div" className="error" />
+              </div>
+              <div className="button-group">
+                <button type="submit" className="button">
+                  Search
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetForm();
+                    values.filteredTodos = values.todos;
+                    values.noResults = false;
+                    values.error = "";
+                  }}
+                  className="button reset-button"
+                >
+                  Reset
+                </button>
+              </div>
+              {/* Display results or error messages */}
+              {values.error ? (
+                <p className="error-message">{values.error}</p>
+              ) : values.noResults ? (
+                <p className="no-results">No results found</p>
+              ) : (
+                <ul className="todo-list">
+                  {values.filteredTodos.map((todo) => (
+                    <li key={todo.id} className="todo-item">
+                      {todo.title}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Form>
+          );
+        }}
+      </Formik>
     </div>
   );
 };
