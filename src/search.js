@@ -1,10 +1,13 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import "./SearchComponent.css"; // Import the CSS file
+import "./search.css"; // Import the CSS file
 
 const SearchComponent = () => {
+  const [todos, setTodos] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const fetchTodos = async () => {
     const response = await axios.get(
       "https://jsonplaceholder.typicode.com/todos"
@@ -12,9 +15,22 @@ const SearchComponent = () => {
     return response.data;
   };
 
+  useEffect(() => {
+    const loadData = async () => {
+      const fetchedTodos = await fetchTodos();
+      setTodos(fetchedTodos);
+      setIsLoading(false);
+    };
+    loadData();
+  }, []);
+
   const validationSchema = Yup.object({
     query: Yup.string().required("Search query is required"),
   });
+
+  if (isLoading) {
+    return <div>Loading...</div>; // Display a loading message while fetching todos
+  }
 
   return (
     <div className="search-container">
@@ -22,15 +38,12 @@ const SearchComponent = () => {
       <Formik
         initialValues={{
           query: "",
-          todos: [],
-          filteredTodos: [],
+          filteredTodos: todos, // Set initial filteredTodos to the fetched todos
           error: "",
           noResults: false,
         }}
         validationSchema={validationSchema}
-        onSubmit={async (values, { setFieldValue }) => {
-          const todos = await fetchTodos();
-          setFieldValue("todos", todos);
+        onSubmit={(values, { setFieldValue }) => {
           const filtered = todos.filter((todo) =>
             todo.title.toLowerCase().includes(values.query.toLowerCase())
           );
@@ -39,22 +52,17 @@ const SearchComponent = () => {
           setFieldValue("error", "");
         }}
       >
-        {({ handleSubmit, resetForm, values }) => {
-          useEffect(() => {
-            const loadData = async () => {
-              const todos = await fetchTodos();
-              resetForm({
-                values: {
-                  query: "",
-                  todos,
-                  filteredTodos: todos,
-                  error: "",
-                  noResults: false,
-                },
-              });
-            };
-            loadData();
-          }, [resetForm]);
+        {({ handleSubmit, resetForm, values, setFieldValue }) => {
+          const handleReset = () => {
+            resetForm({
+              values: {
+                query: "",
+                filteredTodos: todos, // Reset filteredTodos to the original todos
+                error: "",
+                noResults: false,
+              },
+            });
+          };
 
           return (
             <Form onSubmit={handleSubmit} className="form">
@@ -73,12 +81,7 @@ const SearchComponent = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    resetForm();
-                    values.filteredTodos = values.todos;
-                    values.noResults = false;
-                    values.error = "";
-                  }}
+                  onClick={handleReset}
                   className="button reset-button"
                 >
                   Reset
